@@ -3,7 +3,7 @@
 from pydantic import BaseModel, Field
 
 
-class Channel(BaseModel):
+class ChannelModel(BaseModel):
     """Модель данных канала."""
 
     channel_id: int = Field(
@@ -32,7 +32,7 @@ class Channel(BaseModel):
         description="Никнейм автора канала",
     )
 
-class DeleteChannel(BaseModel):
+class DeleteChannelModel(BaseModel):
     """Модель данных канала."""
 
     channel_id: int = Field(

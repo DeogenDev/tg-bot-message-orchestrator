@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, Field, field_validator
 
-class Button(BaseModel):
+class ButtonModel(BaseModel):
     """Модель данных кнопки."""
 
     id: int = Field(
@@ -30,6 +30,10 @@ class Button(BaseModel):
         description="Номер ряда (всего макс 100 кнопок)"
     )
 
+    message_id: int = Field(
+        description="ID сообщения",
+    )
+
     @field_validator("url")
     @classmethod
     def validate_url_scheme(cls, v: str) -> str:
@@ -37,7 +41,7 @@ class Button(BaseModel):
             raise ValueError("URL должен начинаться с http, https или tg")
         return v
 
-class DeleteButton(BaseModel):
+class DeleteButtonModel(BaseModel):
     """Модель данных кнопки."""
 
     id: int = Field(
@@ -57,12 +61,12 @@ class MessageModel(BaseModel):
         max_length=4096,
         description="Текст сообщения (лимит TG — 4096 байт)"
     )
-    buttons: list[Button] | None = Field(
+    buttons: list[ButtonModel] | None = Field(
         max_items=100,
         description="Кнопки (лимит TG — 100 кнопок)"
     )
 
-class DeleteMessage(BaseModel):
+class DeleteMessageModel(BaseModel):
     """Модель данных сообщения."""
 
     id: int = Field(
