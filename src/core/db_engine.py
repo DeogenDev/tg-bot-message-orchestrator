@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from src.core import conf
 
 logger = logging.getLogger(__name__)
-engine = create_async_engine(conf.postgres.dsn, echo=False)
+engine = create_async_engine(conf.database.dsn, echo=False)
 
 session_factory = async_sessionmaker(
     bind=engine,
@@ -17,7 +17,7 @@ session_factory = async_sessionmaker(
     expire_on_commit=False,
 )
 
-from src.db.models import User, WhitelistedPhrases, BlacklistedPhrases, Group  # noqa
+from src.db.models import Button, Channel, Message  # noqa
 
 
 @asynccontextmanager
