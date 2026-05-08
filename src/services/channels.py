@@ -9,7 +9,7 @@ from src.core.interfaces.channels import ChannelRepoBase
 from src.core.schemas.channel import ChannelModel, DeleteChannelModel
 
 
-class ChannelService:
+class ChannelsService:
     """Сервис для работы с каналами."""
 
     def __init__(

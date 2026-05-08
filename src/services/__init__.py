@@ -1,9 +1,9 @@
 """Сервисы приложения."""
 
-from .channels import ChannelService
+from .channels import ChannelsService
 from .messages import MessagesService
 
 __all__ = [
-    "ChannelService",
+    "ChannelsService",
     "MessagesService"
 ]
