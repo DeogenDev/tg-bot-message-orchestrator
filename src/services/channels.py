@@ -13,10 +13,10 @@ class ChannelService:
     """Сервис для работы с каналами."""
 
     def __init__(
-            self,
-            channel_repo: ChannelRepoBase,
-            session_manager: Callable[[], AsyncContextManager[AsyncSession]] = get_session,
-        ) -> None:
+        self,
+        channel_repo: ChannelRepoBase,
+        session_manager: Callable[[], AsyncContextManager[AsyncSession]] = get_session,
+    ) -> None:
         self._session_manager = session_manager
         self._channel_repo = channel_repo
 

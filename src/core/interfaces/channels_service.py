@@ -9,6 +9,11 @@ class ChannelServiceBase(ABC):
     """Интерфейс сервиса каналов."""
 
     @abstractmethod
+    def get_channels(self) -> list[ChannelModel]:
+        """Получить список каналов."""
+        raise NotImplementedError
+
+    @abstractmethod
     def add_channel(self, channel: ChannelModel) -> None:
         """Добавить канал."""
         raise NotImplementedError
@@ -18,7 +23,3 @@ class ChannelServiceBase(ABC):
         """Удалить канал."""
         raise NotImplementedError
 
-    @abstractmethod
-    def get_channels(self) -> list[ChannelModel]:
-        """Получить список каналов."""
-        raise NotImplementedError

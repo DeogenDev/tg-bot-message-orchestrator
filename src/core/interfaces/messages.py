@@ -18,6 +18,12 @@ class MessageRepoBase(ABC):
         """Добавить сообщение."""
         raise NotImplementedError
 
+
+    @abstractmethod
+    def edit_message(self, message: MessageModel) -> None:
+        """Обновить только текст сообщения."""
+        raise NotImplementedError
+
     @abstractmethod
     def get_messages(self) -> list[MessageModel]:
         """Получить список сообщений."""
