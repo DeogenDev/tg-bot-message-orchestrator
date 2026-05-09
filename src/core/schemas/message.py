@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, field_validator
 class ButtonModel(BaseModel):
     """Модель данных кнопки."""
 
-    id: int = Field(
+    id: int | None = Field(
         ge=1,
         description="ID кнопки"
     )

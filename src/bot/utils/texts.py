@@ -29,6 +29,8 @@ class Messages:
     SUCCESS_SEND_MESSAGE = "Сообщение успешно отправлено."
     FAIL_SEND_MESSAGE = "Сообщение не отправлено."
     OPEN_MESSAGE_INFO = "Выберите действие над сообщением."
+    NO_BUTTONS = "У сообщения нет кнопок."
+    CHOISE_BUTTON_FOR_DELETE = "Выберите кнопку которую нужно удалить."
 
 
 class Buttons:
@@ -38,7 +40,7 @@ class Buttons:
     SUCCESS_ADD_BUTTON = "Кнопка успешно добавлена."
     FAIL_ADD_BUTTON = "Кнопка не добавлена."
     CHOISE_BUTTON_FOR_DELETE = "Выберите кнопку которую нужно удалить."
-    DELETE_BUTTON = "Кнопка успешно удалена."
+    SUCCESS_DELETE_BUTTON = "Кнопка успешно удалена."
     FAIL_DELETE_BUTTON = "Кнопка не удалена."
 
 
@@ -46,6 +48,7 @@ class Texts:
     common = Common
     channels = Channels
     messages = Messages
+    buttons = Buttons
 
 
 texts = Texts
