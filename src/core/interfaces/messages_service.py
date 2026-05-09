@@ -19,6 +19,11 @@ class MessagesServiceBase(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_message(self, id: int) -> MessageModel:
+        """Получить сообщение."""
+        raise NotImplementedError
+
+    @abstractmethod
     async def add_message(self, message: MessageModel) -> None:
         """Добавить сообщение."""
         raise NotImplementedError

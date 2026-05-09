@@ -32,6 +32,11 @@ class MessagesService(MessagesServiceBase):
         async with self._session_manager() as session:
             return await self._messages_repo.get_messages(session)
 
+    async def get_message(self, id: int) -> MessageModel:
+        """Получить сообщение."""
+        async with self._session_manager() as session:
+            return await self._messages_repo.get_message(session, id)
+
     async def add_message(self, message: MessageModel) -> None:
         """Добавить сообщение."""
         async with self._session_manager() as session:

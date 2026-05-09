@@ -49,7 +49,7 @@ class MessageRepo(MessageRepoBase):
     async def get_messages(
             self,
             session: AsyncSession
-    ):
+    ) -> list[MessageModel]:
         """Получить список сообщений."""
         stmt = select(Message)
         result = await session.execute(stmt)
@@ -59,6 +59,18 @@ class MessageRepo(MessageRepoBase):
             MessageModel.model_validate(message, from_attributes=True)
             for message in messages_db
         ]
+
+    async def get_message(
+            self,
+            session: AsyncSession,
+            id: int
+    ) -> MessageModel:
+        """Получить сообщение."""
+        stmt = select(Message).where(Message.id == id)
+        result = await session.execute(stmt)
+        message_db = result.scalars().one()
+
+        return MessageModel.model_validate(message_db, from_attributes=True)
 
     async def add_button(
         self, 

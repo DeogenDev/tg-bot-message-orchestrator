@@ -18,7 +18,7 @@ class ContextMiddleware(BaseMiddleware):
     def __init__(
         self,
         channel_service: ChannelServiceBase,
-        messages_service: MessagesServiceBase,
+        messages_service: MessagesServiceBase,        
     ):
         """Инициализация мидлвара."""
         self.channel_service = channel_service

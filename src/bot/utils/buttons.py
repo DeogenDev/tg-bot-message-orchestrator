@@ -33,7 +33,7 @@ messages_config = InlineKeyboardMarkup(
             InlineKeyboardButton(text="Удалить сообщение", callback_data="delete_message"),
         ],
         [
-            InlineKeyboardButton(text="Редактировать сообщение", callback_data="edit_message"),
+            InlineKeyboardButton(text="Открыть сообщения", callback_data="open_messages"),
         ]
         [
             InlineKeyboardButton(text="⬅️ Назад", callback_data="start")
@@ -47,6 +47,7 @@ messages_config_edit = InlineKeyboardMarkup(
             InlineKeyboardButton(text="Заменить текст", callback_data="edit_message_text"),
             InlineKeyboardButton(text="Добавить кнопку", callback_data="add_button"),
             InlineKeyboardButton(text="Удалить кнопку", callback_data="delete_button"),
+            InlineKeyboardButton(text="Отправить сообщение в канал", callback_data="send_message_to_channel"),
         ],
         [
             InlineKeyboardButton(text="⬅️ Назад", callback_data="config_messages")

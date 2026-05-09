@@ -25,6 +25,10 @@ class Messages:
     CHOISE_MESSAGE_FOR_DELETE = "Выберите сообщение которое нужно удалить."
     DELETE_MESSAGE = "Сообщение успешно удалено."
     FAIL_DELETE_MESSAGE = "Сообщение не удалено."
+    SEND_MESSAGE_TO_CHANNEL = "Выберите канал в который нужно отправить сообщение."
+    SUCCESS_SEND_MESSAGE = "Сообщение успешно отправлено."
+    FAIL_SEND_MESSAGE = "Сообщение не отправлено."
+    OPEN_MESSAGE_INFO = "Выберите действие над сообщением."
 
 
 class Buttons:
