@@ -41,7 +41,7 @@ class TelegramBot:
                 )
             )
 
-        self.dp.include_router(
+        self.dp.include_routers(
             common_router,
             messages_router,
             buttons_router,
