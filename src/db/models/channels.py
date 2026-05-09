@@ -27,7 +27,7 @@ class Channel(Base):
     )
 
     title: Mapped[str] = mapped_column(
-        String(255),
+        String(256),
         nullable=False
     )
 

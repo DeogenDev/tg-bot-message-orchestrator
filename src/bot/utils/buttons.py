@@ -34,7 +34,7 @@ messages_config = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton(text="Открыть сообщения", callback_data="open_messages"),
-        ]
+        ],
         [
             InlineKeyboardButton(text="⬅️ Назад", callback_data="start")
         ]

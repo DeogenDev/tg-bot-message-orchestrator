@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
-from src.core import conf
+from src.core.config import conf
 
 logger = logging.getLogger(__name__)
 engine = create_async_engine(conf.database.dsn, echo=False)
@@ -26,6 +26,7 @@ async def get_session():
     async with session_factory() as session:
         try:
             yield session
+            await session.commit()
         except Exception as e:
             await session.rollback()
             logger.error(f"Database transaction error: {e}")

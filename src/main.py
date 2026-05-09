@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 async def main():
     logger.info("Starting bot")
-    await bot.start_polling()
+    await bot.start()
 
 
 if __name__ == "__main__":

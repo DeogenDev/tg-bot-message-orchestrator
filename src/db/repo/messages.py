@@ -1,6 +1,7 @@
 """Репозиторий сообщений."""
 
 from sqlalchemy import delete, update, select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.interfaces.messages import MessageRepoBase
@@ -51,7 +52,7 @@ class MessageRepo(MessageRepoBase):
             session: AsyncSession
     ) -> list[MessageModel]:
         """Получить список сообщений."""
-        stmt = select(Message)
+        stmt = select(Message).options(selectinload(Message.buttons))
         result = await session.execute(stmt)
         messages_db = result.scalars().all()
 
@@ -66,7 +67,7 @@ class MessageRepo(MessageRepoBase):
             id: int
     ) -> MessageModel:
         """Получить сообщение."""
-        stmt = select(Message).where(Message.id == id)
+        stmt = select(Message).options(selectinload(Message.buttons)).where(Message.id == id)
         result = await session.execute(stmt)
         message_db = result.scalars().one()
 

@@ -50,14 +50,14 @@ def build_keyboard_from_models(buttons: list[ButtonModel]) -> Optional[InlineKey
     return builder.as_markup()
 
 
-@router.message(F == "add_message")
+@router.callback_query(F.data == "add_message")
 async def add_message_handler(
-    message: Message,
+    callback_query: CallbackQuery,
     state: FSMContext,
     texts: Texts,
     buttons: Buttons
 ) -> None:
-    await message.answer(
+    await callback_query.message.edit_text(
         texts.messages.INPUT_MESSAGE_TEXT,
         reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS
     )
@@ -97,7 +97,7 @@ async def add_message_handler_text(
         logger.warning(f"Не удалось отправить сообщение: {e}")
 
 
-@router.callback_query(F == "delete_message")
+@router.callback_query(F.data == "delete_message")
 async def choice_delete_message_handler(
     callback_query: CallbackQuery,
     texts: Texts,
@@ -141,7 +141,7 @@ async def choice_delete_message_handler(
     )
 
 
-@router.callback_query(F.startwith("delete_message_id:"))
+@router.callback_query(F.data.startswith("delete_message_id:"))
 async def delete_message_handler_callback(
     callback_query: CallbackQuery,
     texts: Texts,
@@ -170,7 +170,7 @@ async def delete_message_handler_callback(
         logger.warning(f"Не удалось обновить сообщение: {e}")
 
 
-@router.callback_query(F == "open_messages")
+@router.callback_query(F.data == "open_messages")
 async def open_message_handler(
     callback_query: CallbackQuery,
     texts: Texts,
@@ -218,7 +218,7 @@ async def open_message_handler(
     )
 
 
-@router.callback_query(F.startwith("open_message_id:"))
+@router.callback_query(F.data.startswith("open_message_id:"))
 async def open_message_handler_callback(
     callback_query: CallbackQuery,
     texts: Texts,
@@ -227,7 +227,7 @@ async def open_message_handler_callback(
     messages_service: MessagesServiceBase
 ) -> None:
     message_id = callback_query.data.split(":")[1]
-    await state.set_data({"open_message_id": message_id})
+    await state.update_data(open_message_id=int(message_id))
 
     await callback_query.message.edit_text(
         text=texts.messages.OPEN_MESSAGE_INFO,
@@ -235,7 +235,7 @@ async def open_message_handler_callback(
     )
 
 
-@router.callback_query(F == "send_message_to_channel")
+@router.callback_query(F.data == "send_message_to_channel")
 async def send_message_to_channel_handler(
     callback_query: CallbackQuery,
     texts: Texts,
@@ -278,7 +278,7 @@ async def send_message_to_channel_handler(
         reply_markup=channels_keyboard
     )
 
-@router.callback_query(F.startwith("send_message:"))
+@router.callback_query(F.data.startswith("send_message:"))
 async def send_message_to_channel_handler_callback(
     callback_query: CallbackQuery,
     texts: Texts,
@@ -288,7 +288,8 @@ async def send_message_to_channel_handler_callback(
 ) -> None:
     channel_id = callback_query.data.split(":")[1]
 
-    message_id = (await state.get_data())["open_message_id"]
+    state_data = await state.get_data()
+    message_id = state_data["open_message_id"]
     text = texts.messages.FAIL_SEND_MESSAGE
     try: 
         message_model = await message_service.get_message(id=message_id)
@@ -296,9 +297,9 @@ async def send_message_to_channel_handler_callback(
         message_keyboard = build_keyboard_from_models(message_model.buttons)
         
         await callback_query.bot.send_message(
-            chat_id=channel_id,
-            message=message_model.text,
-            keyboard=message_keyboard
+            chat_id=int(channel_id),
+            text=message_model.text,
+            reply_markup=message_keyboard
         )
 
         text = texts.messages.SUCCESS_SEND_MESSAGE

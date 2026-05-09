@@ -27,7 +27,7 @@ async def start_handler(
     await state.clear()
 
 
-@router.callback_query(F == "start")
+@router.callback_query(F.data == "start")
 async def start_handler_callback(
     callback_query: CallbackQuery,
     state: FSMContext,
@@ -42,7 +42,7 @@ async def start_handler_callback(
     await state.clear()
 
 
-@router.callback_query(F == "config_channels")
+@router.callback_query(F.data == "config_channels")
 async def config_channels_handler_callback(
     callback_query: CallbackQuery,
     state: FSMContext,
@@ -56,7 +56,7 @@ async def config_channels_handler_callback(
     await state.clear()
 
 
-@router.callback_query(F == "config_messages")
+@router.callback_query(F.data == "config_messages")
 async def config_messages_handler_callback(
     callback_query: CallbackQuery,
     state: FSMContext,

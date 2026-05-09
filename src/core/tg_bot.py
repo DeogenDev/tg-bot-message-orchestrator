@@ -2,8 +2,7 @@
 
 from src.bot.bot import TelegramBot
 from .services import channels_service, messages_service
-
-from core.config import conf
+from .config import conf
 
 
 bot = TelegramBot(
@@ -12,4 +11,3 @@ bot = TelegramBot(
     channels_service=channels_service,
     messages_service=messages_service
 )
-

@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
-@router.callback_query(F == "add_channel")
+@router.callback_query(F.data == "add_channel")
 async def add_channel_handler_callback(
     callback_query: CallbackQuery,
     state: FSMContext,
@@ -72,7 +72,7 @@ async def add_channel_handler(
     )
 
 
-@router.callback_query(F == "delete_channel")
+@router.callback_query(F.data == "delete_channel")
 async def choise_delete_channel_handler_callback(
     callback_query: CallbackQuery,
     texts: Texts,
@@ -113,7 +113,7 @@ async def choise_delete_channel_handler_callback(
     )
 
 
-@router.callback_query(F.startwith("delete_channel_id:"))
+@router.callback_query(F.data.startswith("delete_channel_id:"))
 async def delete_channel_handler_callback(
     callback_query: CallbackQuery,
     texts: Texts,

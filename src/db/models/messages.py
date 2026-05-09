@@ -24,7 +24,7 @@ class Message(Base):
     )
 
     text: Mapped[str] = mapped_column(
-        String(255),
+        String(4096),
         nullable=False
     )
 

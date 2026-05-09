@@ -30,7 +30,7 @@ class ContextMiddleware(BaseMiddleware):
         data["channel_service"] = self.channel_service
         data["messages_service"] = self.messages_service
         data["texts"] = texts
-        data["buttons"] = Buttons
+        data["buttons"] = Buttons()
         return await handler(event, data)
 
 

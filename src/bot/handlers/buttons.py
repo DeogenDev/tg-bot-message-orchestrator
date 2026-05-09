@@ -97,15 +97,15 @@ def build_advanced_keyboard(buttons: list[ButtonModel]) -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-@router.callback_query(F == "add_button")
+@router.callback_query(F.data == "add_button")
 async def add_button_handler_callback(
     callback_query: CallbackQuery,
     state: FSMContext,
     texts: Texts,
     messages_service: MessagesServiceBase
 ) -> None:
-
-    message_id = await state.get_data()["open_message_id"]
+    state_data = await state.get_data()
+    message_id = state_data["open_message_id"]
 
     message_model = await messages_service.get_message(id=message_id)
 
@@ -116,7 +116,7 @@ async def add_button_handler_callback(
         reply_markup=add_keyboard
     )
 
-@router.callback_query(F.startwith("add_button:"))
+@router.callback_query(F.data.startswith("add_button:"))
 async def add_button_handler_text(
     callback_query: CallbackQuery,
     state: FSMContext,
@@ -124,7 +124,7 @@ async def add_button_handler_text(
     buttons: Buttons
 ) -> None:
     row, col = callback_query.data.split(":")[1:]
-    await state.set_data({"add_button": {"row": row, "col": col}})
+    await state.update_data(add_button={"row": int(row), "col": int(col)})
 
     await callback_query.message.edit_text(
         texts.buttons.INPUT_BUTTON_TEXT,
@@ -146,7 +146,10 @@ async def add_button_handler_url(
         reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS
     )
 
-    await state.set_data({"add_button": {"text": message.text}})
+    state_data = await state.get_data()
+    add_button_data = state_data.get("add_button", {})
+    add_button_data["text"] = message.text
+    await state.update_data(add_button=add_button_data)
 
     await state.set_state(InputStates.button_url)
 
@@ -187,11 +190,11 @@ async def add_button(
         add_data = state_data.get("add_button", {})
         
         button = ButtonModel(
-            text=add_data("text"),
+            text=add_data["text"],
             url=final_url,
-            row=add_data("row"),
-            column=add_data("col"),
-            message_id=state_data("open_message_id")
+            row=add_data["row"],
+            column=add_data["col"],
+            message_id=state_data["open_message_id"]
         )
 
         await message_service.add_button(button)
@@ -207,7 +210,7 @@ async def add_button(
         reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS
     )
 
-@router.callback_query(F == "delete_button")
+@router.callback_query(F.data == "delete_button")
 async def delete_button_handler_callback(
     callback_query: CallbackQuery,
     state: FSMContext,
@@ -215,7 +218,8 @@ async def delete_button_handler_callback(
     buttons: Buttons,
     messages_service: MessagesServiceBase
 ) -> None:
-    message_id = await state.get_data()["open_message_id"]
+    state_data = await state.get_data()
+    message_id = state_data["open_message_id"]
 
     message_model = await messages_service.get_message(id=message_id)
 
@@ -234,7 +238,7 @@ async def delete_button_handler_callback(
     )
 
 
-@router.callback_query(F.startwith("delete_button_id:"))
+@router.callback_query(F.data.startswith("delete_button_id:"))
 async def delete_button_callback(
     callback_query: CallbackQuery,
     texts: Texts,
@@ -242,7 +246,7 @@ async def delete_button_callback(
     messages_service: MessagesServiceBase
 ) -> None:
     button_id = callback_query.data.split(":")[1]
-    delete_button_model = DeleteButtonModel(id=button_id)
+    delete_button_model = DeleteButtonModel(id=int(button_id))
 
     text = texts.buttons.FAIL_DELETE_BUTTON
 
