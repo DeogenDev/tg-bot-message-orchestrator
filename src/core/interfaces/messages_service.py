@@ -14,32 +14,32 @@ class MessagesServiceBase(ABC):
 
 
     @abstractmethod
-    def get_messages(self) -> list[MessageModel]:
+    async def get_messages(self) -> list[MessageModel]:
         """Получить список сообщений."""
         raise NotImplementedError
 
     @abstractmethod
-    def add_message(self, message: MessageModel) -> None:
+    async def add_message(self, message: MessageModel) -> None:
         """Добавить сообщение."""
         raise NotImplementedError
 
     @abstractmethod
-    def edit_message(self, message: MessageModel) -> None:
+    async def edit_message(self, message: MessageModel) -> None:
         """Обновить только текст сообщения."""
         raise NotImplementedError
 
     @abstractmethod
-    def add_button(self, button: ButtonModel) -> None:
+    async def add_button(self, button: ButtonModel) -> None:
         """Добавить кнопку."""
         raise NotImplementedError
 
     @abstractmethod
-    def delete_message(self, delete_message_model: DeleteMessageModel) -> None:
+    async def delete_message(self, delete_message_model: DeleteMessageModel) -> None:
         """Удалить сообщение."""
         raise NotImplementedError
 
 
     @abstractmethod
-    def delete_button(self, delete_button_model: DeleteButtonModel) -> None:
+    async def delete_button(self, delete_button_model: DeleteButtonModel) -> None:
         """Удалить кнопку."""
         raise NotImplementedError

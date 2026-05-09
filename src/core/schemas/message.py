@@ -52,7 +52,7 @@ class DeleteButtonModel(BaseModel):
 class MessageModel(BaseModel):
     """Модель данных сообщения."""
 
-    id: int = Field(
+    id: int | None = Field(
         ge=1,
         description="ID сообщения"
     )

@@ -9,6 +9,7 @@ from src.core.interfaces.channels_service import ChannelServiceBase
 from src.core.interfaces.messages_service import MessagesServiceBase
 
 from .texts import texts
+from .buttons import Buttons
 
 
 class ContextMiddleware(BaseMiddleware):
@@ -29,6 +30,7 @@ class ContextMiddleware(BaseMiddleware):
         data["channel_service"] = self.channel_service
         data["messages_service"] = self.messages_service
         data["texts"] = texts
+        data["buttons"] = Buttons
         return await handler(event, data)
 
 
