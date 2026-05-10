@@ -2,7 +2,7 @@
 
 from typing import  List, TYPE_CHECKING
 
-from sqlalchemy import String, Integer
+from sqlalchemy import String, Integer, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.db.model_base import Base
@@ -26,6 +26,10 @@ class Message(Base):
     text: Mapped[str] = mapped_column(
         String(4096),
         nullable=False
+    )
+    entities: Mapped[list[dict] | None] = mapped_column(
+        JSON,
+        nullable=True
     )
 
     buttons: Mapped[List["Button"]] = relationship(

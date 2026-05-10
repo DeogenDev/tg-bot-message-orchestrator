@@ -4,6 +4,7 @@ import logging
 
 from typing import Optional
 from aiogram import Router, F
+from aiogram.enums import ParseMode
 
 from aiogram.types import Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
@@ -56,6 +57,12 @@ def build_keyboard_delete_buttons(buttons: list[ButtonModel]) -> Optional[Inline
 def build_advanced_keyboard(buttons: list[ButtonModel]) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     
+    # Определяем индекс следующего доступного ряда
+    # Если кнопок нет, начнем с 1, если есть — берем max + 1
+    next_row_index = 1
+    if buttons:
+        next_row_index = max(btn.row for btn in buttons) + 1
+
     # 1. Если кнопок нет вообще
     if not buttons:
         builder.row(InlineKeyboardButton(
@@ -68,18 +75,15 @@ def build_advanced_keyboard(buttons: list[ButtonModel]) -> InlineKeyboardMarkup:
         for btn in sorted(buttons, key=lambda b: (b.row, b.column)):
             rows.setdefault(btn.row, []).append(btn)
         
-        # Проходим по рядам
         for row_index in sorted(rows.keys()):
             current_row_models = rows[row_index]
-            
             row_btns = [
                 InlineKeyboardButton(text=btn.text, url=btn.url) 
                 for btn in current_row_models
             ]
             
-            # Если в ряду меньше 3 кнопок, добавляем "Выбрать" справа
+            # Добавляем "Выбрать" справа, если в ряду < 3 кнопок
             if len(row_btns) < 3:
-                # Находим максимальную колонку в текущем ряду
                 max_col = max(btn.column for btn in current_row_models)
                 row_btns.append(InlineKeyboardButton(
                     text="✅ Выбрать",
@@ -87,6 +91,14 @@ def build_advanced_keyboard(buttons: list[ButtonModel]) -> InlineKeyboardMarkup:
                 ))
             
             builder.row(*row_btns)
+
+    # --- НОВОЕ: Кнопка "Выбрать" в новом ряду (предпоследняя) ---
+    # Добавляем её только если у нас уже есть кнопки (чтобы не дублировать пункт 1)
+    if buttons:
+        builder.row(InlineKeyboardButton(
+            text="✅ Выбрать",
+            callback_data=f"add_button:{next_row_index}:1"
+        ))
 
     # 3. Кнопка "Назад" всегда в самом низу
     builder.row(InlineKeyboardButton(
@@ -112,8 +124,9 @@ async def add_button_handler_callback(
     add_keyboard = build_advanced_keyboard(message_model.buttons)
 
     await callback_query.message.edit_text(
-        texts.buttons.CHOISE_BUTTON_FOR_DELETE,
-        reply_markup=add_keyboard
+        texts.buttons.CHOISE_PLACE_FOR_BUTTON,
+        reply_markup=add_keyboard,
+        parse_mode=ParseMode.HTML
     )
 
 @router.callback_query(F.data.startswith("add_button:"))
@@ -128,7 +141,8 @@ async def add_button_handler_text(
 
     await callback_query.message.edit_text(
         texts.buttons.INPUT_BUTTON_TEXT,
-        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS
+        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+        parse_mode=ParseMode.HTML
     )
 
     await state.set_state(InputStates.button_text)
@@ -141,9 +155,18 @@ async def add_button_handler_url(
     texts: Texts,
     buttons: Buttons
 ) -> None:
+    if not message.text:
+        await message.answer(
+            texts.buttons.INVALID_BUTTON_TEXT,
+            reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+            parse_mode=ParseMode.HTML
+        )
+        return
+
     await message.answer(
         texts.buttons.INPUT_BUTTON_FORWARD_MESSAGE,
-        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS
+        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+        parse_mode=ParseMode.HTML
     )
 
     state_data = await state.get_data()
@@ -160,13 +183,14 @@ async def add_button(
     state: FSMContext,
     texts: Texts,
     buttons: Buttons,
-    message_service: MessagesServiceBase
+    messages_service: MessagesServiceBase
 ) -> None:
 
     if not message.forward_from_chat or not message.forward_from_message_id:
         await message.answer(
-            texts.buttons.FAIL_ADD_BUTTON,
-            reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS
+            texts.buttons.INVALID_BUTTON_FORWARD_MESSAGE,
+            reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+            parse_mode=ParseMode.HTML
         )
         return
 
@@ -197,7 +221,7 @@ async def add_button(
             message_id=state_data["open_message_id"]
         )
 
-        await message_service.add_button(button)
+        await messages_service.add_button(button)
 
         text = texts.buttons.SUCCESS_ADD_BUTTON
     except Exception as e:
@@ -207,7 +231,8 @@ async def add_button(
 
     await message.answer(
         text=text,
-        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS
+        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+        parse_mode=ParseMode.HTML
     )
 
 @router.callback_query(F.data == "delete_button")
@@ -228,13 +253,15 @@ async def delete_button_handler_callback(
     if not delete_button_keyboard:
         await callback_query.message.edit_text(
             texts.messages.NO_BUTTONS,
-            reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS
+            reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+            parse_mode=ParseMode.HTML
         )
         return
 
     await callback_query.message.edit_text(
         texts.buttons.CHOISE_BUTTON_FOR_DELETE,
-        reply_markup=delete_button_keyboard
+        reply_markup=delete_button_keyboard,
+        parse_mode=ParseMode.HTML
     )
 
 
@@ -258,5 +285,6 @@ async def delete_button_callback(
 
     await callback_query.message.edit_text(
         text=text,
-        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS
+        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+        parse_mode=ParseMode.HTML
     )

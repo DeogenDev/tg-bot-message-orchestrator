@@ -91,8 +91,15 @@ class MessageRepo(MessageRepoBase):
         delete_message_model: DeleteMessageModel
     ) -> None:
         """Удалить сообщение."""
+        # Bulk DELETE не запускает ORM cascade, поэтому сначала удаляем
+        # дочерние кнопки, а потом само сообщение.
+        delete_buttons_stmt = (
+            delete(Button)
+            .where(Button.message_id == delete_message_model.id)
+        )
         stmt = delete(Message).where(Message.id == delete_message_model.id)
 
+        await session.execute(delete_buttons_stmt)
         await session.execute(stmt)
         await session.flush()
 

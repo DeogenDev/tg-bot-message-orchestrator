@@ -9,6 +9,7 @@ class InputStates(StatesGroup):
     channel_link = State()
 
     message_text = State()
+    edit_message_text = State()
 
     button_text = State()
     button_url = State()

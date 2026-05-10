@@ -46,6 +46,8 @@ messages_config_edit = InlineKeyboardMarkup(
         [   
             InlineKeyboardButton(text="Заменить текст", callback_data="edit_message_text"),
             InlineKeyboardButton(text="Добавить кнопку", callback_data="add_button"),
+        ],
+        [
             InlineKeyboardButton(text="Удалить кнопку", callback_data="delete_button"),
             InlineKeyboardButton(text="Отправить сообщение в канал", callback_data="send_message_to_channel"),
         ],

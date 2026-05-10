@@ -1,6 +1,8 @@
 """Телеграмм бот."""
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
 
 from src.core.interfaces.channels_service import ChannelServiceBase
 from src.core.interfaces.messages_service import MessagesServiceBase
@@ -24,7 +26,10 @@ class TelegramBot:
         channels_service: ChannelServiceBase,
         messages_service: MessagesServiceBase
     ) -> None:
-        self._bot = Bot(token=token)
+        self._bot = Bot(
+            token=token,
+            default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN)
+        )
         self.dp = Dispatcher()
         self.allowed_users = allowed_users
         self.channels_service = channels_service

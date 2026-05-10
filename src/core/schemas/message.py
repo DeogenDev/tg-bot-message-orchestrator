@@ -2,10 +2,23 @@
 
 from pydantic import BaseModel, Field, field_validator
 
+
+class MessageEntityModel(BaseModel):
+    """Сериализуемая модель Telegram entity."""
+
+    type: str
+    offset: int = Field(ge=0)
+    length: int = Field(ge=0)
+    url: str | None = None
+    user: dict | None = None
+    language: str | None = None
+    custom_emoji_id: str | None = None
+
 class ButtonModel(BaseModel):
     """Модель данных кнопки."""
 
     id: int | None = Field(
+        default=None,
         ge=1,
         description="ID кнопки"
     )
@@ -53,6 +66,7 @@ class MessageModel(BaseModel):
     """Модель данных сообщения."""
 
     id: int | None = Field(
+        default=None,
         ge=1,
         description="ID сообщения"
     )
@@ -61,7 +75,12 @@ class MessageModel(BaseModel):
         max_length=4096,
         description="Текст сообщения (лимит TG — 4096 байт)"
     )
+    entities: list[MessageEntityModel] | None = Field(
+        default=None,
+        description="Telegram entities для сохранения форматирования"
+    )
     buttons: list[ButtonModel] | None = Field(
+        default=None,
         max_items=100,
         description="Кнопки (лимит TG — 100 кнопок)"
     )

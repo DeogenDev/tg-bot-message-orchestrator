@@ -1,6 +1,7 @@
 """Общие хендлеры."""
 
 from aiogram import Router, F
+from aiogram.enums import ParseMode
 
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart
@@ -21,7 +22,8 @@ async def start_handler(
 ) -> None:
     await message.answer(
         texts.common.START,
-        reply_markup=buttons.START_BUTTONS
+        reply_markup=buttons.START_BUTTONS,
+        parse_mode=ParseMode.HTML
     )
 
     await state.clear()
@@ -36,7 +38,8 @@ async def start_handler_callback(
 ) -> None:
     await callback_query.message.edit_text(
         texts.common.START,
-        reply_markup=buttons.START_BUTTONS
+        reply_markup=buttons.START_BUTTONS,
+        parse_mode=ParseMode.HTML
     )
 
     await state.clear()
@@ -51,7 +54,8 @@ async def config_channels_handler_callback(
 ) -> None:
     await callback_query.message.edit_text(
         texts.channels.ABOUT_CHANNELS_INFO,
-        reply_markup=buttons.CHANNELS_CONFIG_BUTTONS
+        reply_markup=buttons.CHANNELS_CONFIG_BUTTONS,
+        parse_mode=ParseMode.HTML
     )
     await state.clear()
 
@@ -65,6 +69,7 @@ async def config_messages_handler_callback(
 ) -> None:
     await callback_query.message.edit_text(
         texts.messages.ABOUT_MESSAGES_INFO,
-        reply_markup=buttons.MESSAGES_CONFIG_BUTTONS
+        reply_markup=buttons.MESSAGES_CONFIG_BUTTONS,
+        parse_mode=ParseMode.HTML
     )
     await state.clear()

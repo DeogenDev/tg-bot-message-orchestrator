@@ -3,6 +3,7 @@
 import logging
 
 from aiogram import Router, F
+from aiogram.enums import ParseMode
 
 from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
@@ -31,7 +32,8 @@ async def add_channel_handler_callback(
 ) -> None:
     await callback_query.message.edit_text(
         texts.channels.INPUT_FORWARD_MESSAGE,
-        reply_markup=buttons.RETURN_TO_CHANNELS_CONFIG_BUTTONS
+        reply_markup=buttons.RETURN_TO_CHANNELS_CONFIG_BUTTONS,
+        parse_mode=ParseMode.HTML
     )
 
     await state.set_state(InputStates.channel_link)
@@ -45,16 +47,17 @@ async def add_channel_handler(
     texts: Texts,
     buttons: Buttons
 ) -> None:
-    await state.clear()
-
     chat_data = message.forward_from_chat
 
     if not chat_data:
         await message.answer(
-            texts.channels.FAIL_ADD_CHANNEL,
-            reply_markup=buttons.RETURN_TO_CHANNELS_CONFIG_BUTTONS
+            texts.channels.INVALID_FORWARD_MESSAGE,
+            reply_markup=buttons.RETURN_TO_CHANNELS_CONFIG_BUTTONS,
+            parse_mode=ParseMode.HTML
         )
         return
+
+    await state.clear()
 
     channel = ChannelModel(
         channel_id=chat_data.id,
@@ -68,7 +71,8 @@ async def add_channel_handler(
 
     await message.answer(
         texts.channels.SUCCESS_ADD_CHANNEL,
-        reply_markup=buttons.RETURN_TO_CHANNELS_CONFIG_BUTTONS
+        reply_markup=buttons.RETURN_TO_CHANNELS_CONFIG_BUTTONS,
+        parse_mode=ParseMode.HTML
     )
 
 
@@ -84,7 +88,8 @@ async def choise_delete_channel_handler_callback(
     if not channels:
         await callback_query.message.edit_text(
             texts.channels.NO_CHANNELS,
-            reply_markup=buttons.RETURN_TO_CHANNELS_CONFIG_BUTTONS
+            reply_markup=buttons.RETURN_TO_CHANNELS_CONFIG_BUTTONS,
+            parse_mode=ParseMode.HTML
         )
         return
 
@@ -109,7 +114,8 @@ async def choise_delete_channel_handler_callback(
 
     await callback_query.message.edit_text(
         texts.channels.CHOISE_CHANNEL_FOR_DELETE,
-        reply_markup=channels_keyboard
+        reply_markup=channels_keyboard,
+        parse_mode=ParseMode.HTML
     )
 
 
@@ -136,7 +142,8 @@ async def delete_channel_handler_callback(
     try:
         await callback_query.message.edit_text(
             text=text,
-            reply_markup=buttons.RETURN_TO_CHANNELS_CONFIG_BUTTONS
+            reply_markup=buttons.RETURN_TO_CHANNELS_CONFIG_BUTTONS,
+            parse_mode=ParseMode.HTML
         )
     except Exception as e:
         logger.warning(f"Не удалось обновить сообщение: {e}")

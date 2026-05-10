@@ -47,7 +47,7 @@ class Button(Base):
 
     message_id: Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("messages.id")
+        ForeignKey("messages.id", ondelete="CASCADE")
     )
     message: Mapped["Message"] = relationship(
         back_populates="buttons"
