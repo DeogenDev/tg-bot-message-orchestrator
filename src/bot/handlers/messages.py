@@ -276,7 +276,6 @@ async def open_message_handler_callback(
     texts: Texts,
     buttons: Buttons,
     state: FSMContext,
-    messages_service: MessagesServiceBase
 ) -> None:
     message_id = callback_query.data.split(":")[1]
     await state.update_data(open_message_id=int(message_id))

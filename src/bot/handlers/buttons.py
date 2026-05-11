@@ -1,6 +1,7 @@
 """Хендлер для работы с кнопками."""
 
 import logging
+import re
 
 from typing import Optional
 from aiogram import Router, F
@@ -21,6 +22,34 @@ from src.core.schemas.message import ButtonModel, DeleteButtonModel
 
 logger = logging.getLogger(__name__)
 router = Router()
+
+TELEGRAM_MESSAGE_URL_RE = re.compile(
+    r"^(?:https?://)?t(?:elegram)?\.me/(?:(c)/)?([A-Za-z0-9_]+)/(\d+)$"
+)
+
+
+def extract_message_url(message: Message) -> Optional[str]:
+    """Получить ссылку на сообщение из текста или пересланного сообщения."""
+
+    if message.text:
+        match = TELEGRAM_MESSAGE_URL_RE.match(message.text.strip())
+        if match:
+            is_private, chat_ref, message_id = match.groups()
+            if is_private:
+                return f"https://t.me/c/{chat_ref}/{message_id}"
+            return f"https://t.me/{chat_ref}/{message_id}"
+
+    if not message.forward_from_chat or not message.forward_from_message_id:
+        return None
+
+    chat = message.forward_from_chat
+    msg_id = message.forward_from_message_id
+
+    if chat.username:
+        return f"https://t.me/{chat.username}/{msg_id}"
+
+    clean_id = str(chat.id).replace("-100", "")
+    return f"https://t.me/c/{clean_id}/{msg_id}"
 
 
 def build_keyboard_delete_buttons(buttons: list[ButtonModel]) -> Optional[InlineKeyboardMarkup]:
@@ -185,8 +214,8 @@ async def add_button(
     buttons: Buttons,
     messages_service: MessagesServiceBase
 ) -> None:
-
-    if not message.forward_from_chat or not message.forward_from_message_id:
+    final_url = extract_message_url(message)
+    if not final_url:
         await message.answer(
             texts.buttons.INVALID_BUTTON_FORWARD_MESSAGE,
             reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
@@ -195,18 +224,6 @@ async def add_button(
         return
 
     text = texts.buttons.FAIL_ADD_BUTTON
-
-    chat = message.forward_from_chat
-    msg_id = message.forward_from_message_id
-    
-
-    if chat.username:
-        # Для публичных каналов
-        final_url = f"https://t.me{chat.username}/{msg_id}"
-    else:
-        # Для приватных каналов (нужно убрать префикс -100 из ID)
-        clean_id = str(chat.id).replace("-100", "")
-        final_url = f"https://t.me/c/{clean_id}/{msg_id}"
 
     # Получаем данные из стейта один раз для экономии ресурсов
     try:

@@ -54,6 +54,7 @@ alembic/       миграции базы данных
 ```env
 BOT__TOKEN=1234567890:replace_me
 BOT__ALLOWED_USERS=[123456789]
+POSTGRES_HOST_PORT=5433
 DATABASE__HOST=postgres
 DATABASE__PORT=5432
 DATABASE__USER=postgres
@@ -64,6 +65,7 @@ DATABASE__DATABASE=tg_bot
 Пояснения:
 - `BOT__TOKEN` - токен Telegram-бота от `@BotFather`;
 - `BOT__ALLOWED_USERS` - список Telegram ID, которым разрешён доступ к боту;
+- `POSTGRES_HOST_PORT` - внешний порт контейнера PostgreSQL на сервере; если `5432` уже занят, оставь `5433`;
 - `DATABASE__*` - настройки подключения к PostgreSQL.
 
 ## Локальный запуск
@@ -139,6 +141,8 @@ docker compose build
 ```bash
 docker compose up -d
 ```
+
+Контейнер PostgreSQL внутри `docker compose` продолжает слушать `5432`, но на хост публикуется порт из `POSTGRES_HOST_PORT`, по умолчанию `5433`. Это позволяет запускать проект даже если системный PostgreSQL на сервере уже использует `5432`.
 
 ### Логи
 
