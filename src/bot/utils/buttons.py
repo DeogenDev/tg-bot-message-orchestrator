@@ -74,6 +74,16 @@ return_to_channels_config = InlineKeyboardMarkup(
 )
 
 
+def return_to_open_message() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="⬅️ Назад", callback_data="open_current_message")
+            ]
+        ]
+    )
+
+
 class Buttons:
     START_BUTTONS = start_buttons
     CHANNELS_CONFIG_BUTTONS = channels_config

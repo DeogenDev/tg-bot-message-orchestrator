@@ -18,7 +18,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.fsm.context import FSMContext
 
 from src.bot.utils.texts import Texts
-from src.bot.utils.buttons import Buttons
+from src.bot.utils.buttons import Buttons, return_to_open_message
 from src.bot.utils.states import InputStates
 
 from src.core.interfaces.channels_service import ChannelServiceBase
@@ -287,6 +287,32 @@ async def open_message_handler_callback(
     )
 
 
+@router.callback_query(F.data == "open_current_message")
+async def open_current_message_handler(
+    callback_query: CallbackQuery,
+    state: FSMContext,
+    texts: Texts,
+    buttons: Buttons,
+) -> None:
+    state_data = await state.get_data()
+    message_id = state_data.get("open_message_id")
+
+    if message_id is None:
+        await callback_query.message.edit_text(
+            texts.messages.ABOUT_MESSAGES_INFO,
+            reply_markup=buttons.MESSAGES_CONFIG_BUTTONS,
+            parse_mode=ParseMode.HTML
+        )
+        return
+
+    await state.set_state(None)
+    await callback_query.message.edit_text(
+        text=texts.messages.OPEN_MESSAGE_INFO,
+        reply_markup=buttons.MESSAGES_CONFIG_EDIT_BUTTONS,
+        parse_mode=ParseMode.HTML
+    )
+
+
 @router.callback_query(F.data == "edit_message_text")
 async def edit_message_text_handler(
     callback_query: CallbackQuery,
@@ -296,7 +322,7 @@ async def edit_message_text_handler(
 ) -> None:
     await callback_query.message.edit_text(
         texts.messages.INPUT_EDIT_MESSAGE_TEXT,
-        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+        reply_markup=return_to_open_message(),
         parse_mode=ParseMode.HTML
     )
     await state.set_state(InputStates.edit_message_text)
@@ -313,7 +339,7 @@ async def edit_message_text_submit_handler(
     if not message.text:
         await message.answer(
             text=texts.messages.INVALID_MESSAGE_TEXT,
-            reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+            reply_markup=return_to_open_message(),
             parse_mode=ParseMode.HTML
         )
         return
@@ -334,11 +360,11 @@ async def edit_message_text_submit_handler(
     except Exception as e:
         logger.error(f"Ошибка при обновлении текста сообщения: {e}")
 
-    await state.clear()
+    await state.set_state(None)
 
     await message.answer(
         text=text,
-        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+        reply_markup=return_to_open_message(),
         parse_mode=ParseMode.HTML
     )
 
@@ -355,7 +381,7 @@ async def send_message_to_channel_handler(
     if not channels:
         await callback_query.message.edit_text(
             texts.channels.NO_CHANNELS,
-            reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+            reply_markup=return_to_open_message(),
             parse_mode=ParseMode.HTML
         )
         return
@@ -376,7 +402,7 @@ async def send_message_to_channel_handler(
             [
                 InlineKeyboardButton(
                     text="Назад",
-                    callback_data="config_messages"
+                    callback_data="open_current_message"
                 )
             ]
         ]
@@ -424,6 +450,6 @@ async def send_message_to_channel_handler_callback(
 
     await callback_query.message.edit_text(
         text=text,
-        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+        reply_markup=return_to_open_message(),
         parse_mode=ParseMode.HTML
     )

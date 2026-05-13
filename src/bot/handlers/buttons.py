@@ -13,7 +13,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.fsm.context import FSMContext
 
 from src.bot.utils.texts import Texts
-from src.bot.utils.buttons import Buttons
+from src.bot.utils.buttons import Buttons, return_to_open_message
 from src.bot.utils.states import InputStates
 
 from src.core.interfaces.messages_service import MessagesServiceBase
@@ -77,7 +77,7 @@ def build_keyboard_delete_buttons(buttons: list[ButtonModel]) -> Optional[Inline
 
     builder.row(InlineKeyboardButton(
         text="⬅️ Назад", 
-        callback_data="config_messages"
+        callback_data="open_current_message"
     ))
 
     return builder.as_markup()
@@ -132,7 +132,7 @@ def build_advanced_keyboard(buttons: list[ButtonModel]) -> InlineKeyboardMarkup:
     # 3. Кнопка "Назад" всегда в самом низу
     builder.row(InlineKeyboardButton(
         text="⬅️ Назад", 
-        callback_data="config_messages"
+        callback_data="open_current_message"
     ))
 
     return builder.as_markup()
@@ -170,7 +170,7 @@ async def add_button_handler_text(
 
     await callback_query.message.edit_text(
         texts.buttons.INPUT_BUTTON_TEXT,
-        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+        reply_markup=return_to_open_message(),
         parse_mode=ParseMode.HTML
     )
 
@@ -187,14 +187,14 @@ async def add_button_handler_url(
     if not message.text:
         await message.answer(
             texts.buttons.INVALID_BUTTON_TEXT,
-            reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+            reply_markup=return_to_open_message(),
             parse_mode=ParseMode.HTML
         )
         return
 
     await message.answer(
         texts.buttons.INPUT_BUTTON_FORWARD_MESSAGE,
-        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+        reply_markup=return_to_open_message(),
         parse_mode=ParseMode.HTML
     )
 
@@ -218,7 +218,7 @@ async def add_button(
     if not final_url:
         await message.answer(
             texts.buttons.INVALID_BUTTON_FORWARD_MESSAGE,
-            reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+            reply_markup=return_to_open_message(),
             parse_mode=ParseMode.HTML
         )
         return
@@ -244,11 +244,11 @@ async def add_button(
     except Exception as e:
         logger.error(f"Ошибка при добавлении кнопки: {e}")
 
-    await state.clear()
+    await state.set_state(None)
 
     await message.answer(
         text=text,
-        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+        reply_markup=return_to_open_message(),
         parse_mode=ParseMode.HTML
     )
 
@@ -257,7 +257,6 @@ async def delete_button_handler_callback(
     callback_query: CallbackQuery,
     state: FSMContext,
     texts: Texts,
-    buttons: Buttons,
     messages_service: MessagesServiceBase
 ) -> None:
     state_data = await state.get_data()
@@ -270,7 +269,7 @@ async def delete_button_handler_callback(
     if not delete_button_keyboard:
         await callback_query.message.edit_text(
             texts.messages.NO_BUTTONS,
-            reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+            reply_markup=return_to_open_message(),
             parse_mode=ParseMode.HTML
         )
         return
@@ -286,7 +285,6 @@ async def delete_button_handler_callback(
 async def delete_button_callback(
     callback_query: CallbackQuery,
     texts: Texts,
-    buttons: Buttons,
     messages_service: MessagesServiceBase
 ) -> None:
     button_id = callback_query.data.split(":")[1]
@@ -302,6 +300,6 @@ async def delete_button_callback(
 
     await callback_query.message.edit_text(
         text=text,
-        reply_markup=buttons.RETURN_TO_MESSAGES_CONFIG_BUTTONS,
+        reply_markup=return_to_open_message(),
         parse_mode=ParseMode.HTML
     )
