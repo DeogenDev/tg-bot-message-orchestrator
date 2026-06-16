@@ -18,17 +18,20 @@ class ContextMiddleware(BaseMiddleware):
     def __init__(
         self,
         channel_service: ChannelServiceBase,
-        messages_service: MessagesServiceBase,        
+        messages_service: MessagesServiceBase,
+        forward_group_id: int
     ):
         """Инициализация мидлвара."""
         self.channel_service = channel_service
         self.messages_service = messages_service
+        self.forward_group_id = forward_group_id
 
 
     async def __call__(self, handler, event, data):
         """Внедрение сервисов и текстов."""
         data["channel_service"] = self.channel_service
         data["messages_service"] = self.messages_service
+        data["forward_group_id"] = self.forward_group_id
         data["texts"] = texts
         data["buttons"] = Buttons()
         return await handler(event, data)

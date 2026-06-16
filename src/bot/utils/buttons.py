@@ -52,6 +52,9 @@ messages_config_edit = InlineKeyboardMarkup(
             InlineKeyboardButton(text="Отправить сообщение в канал", callback_data="send_message_to_channel"),
         ],
         [
+            InlineKeyboardButton(text="Замнить текста на точку", callback_data="replace_text_with_dot"),
+        ],
+        [
             InlineKeyboardButton(text="⬅️ Назад", callback_data="config_messages")
         ]
     ]

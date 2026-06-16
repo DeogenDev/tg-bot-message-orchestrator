@@ -12,6 +12,9 @@ class BotConfig(BaseModel):
         default_factory=list,
         description="Список Telegram ID с доступом"
     )
+    forward_group_id: int = Field(
+        description="ID канала для пересылки сообщений"
+    )
 
     @field_validator("token")
     @classmethod

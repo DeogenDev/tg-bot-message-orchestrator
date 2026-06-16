@@ -2,6 +2,8 @@
 
 import logging
 
+from asyncio import sleep
+
 from typing import Optional
 from aiogram import Router, F
 from aiogram.enums import ParseMode
@@ -453,3 +455,64 @@ async def send_message_to_channel_handler_callback(
         reply_markup=return_to_open_message(),
         parse_mode=ParseMode.HTML
     )
+
+@router.callback_query(F.data == "replace_text_with_dot")
+async def replace_messages_with_dot(
+    callback_query: CallbackQuery,
+    texts: Texts,
+    buttons: Buttons,
+    forward_group_id: int,
+    state: FSMContext,
+    messages_service: MessagesServiceBase
+):
+    state_data = await state.get_data()
+    message_id = state_data["open_message_id"]
+    message_model = await messages_service.get_message(id=message_id)
+
+    if not message_model.buttons:
+        await callback_query.message.edit_text(
+            texts.messages.NO_BUTTONS,
+            reply_markup=return_to_open_message(),
+            parse_mode=ParseMode.HTML
+        )
+        return
+
+    new_message_text = '.'
+    answer_text = texts.messages.SUCCESS_REPLACE_TEXT_WITH_DOT
+    for button in message_model.buttons:
+
+        chat_id, message_id = button.url.split("/")[-2:]
+        logger.info(f"Пересылаем сообщение {chat_id} - {message_id} в {forward_group_id}")
+
+        try:
+            await callback_query.bot.forward_message(
+                chat_id=forward_group_id,
+                from_chat_id='-100' + chat_id,
+                message_id=message_id
+            )
+        except Exception as e:
+            error_text = (f"Ошибка при пересылке текстовых сообщений: {e}")
+            answer_text = texts.messages.FAIL_REPLACE_TEXT_WITH_DOT + "\n\n" + error_text
+            logger.error(error_text)
+
+        try:
+            await callback_query.bot.edit_message_text(
+                text=new_message_text,
+                chat_id='-100' + chat_id,
+                message_id=message_id
+            )
+        except Exception as e:
+            error_text = (f"Ошибка при замене текстовых сообщений на точку: {e}")
+            answer_text = texts.messages.FAIL_REPLACE_TEXT_WITH_DOT + "\n\n" + error_text
+            logger.error(error_text)        
+
+        await sleep(1)
+
+
+    await callback_query.message.edit_text(
+        text=answer_text,
+        reply_markup=return_to_open_message(),
+        parse_mode=ParseMode.HTML
+    )
+
+

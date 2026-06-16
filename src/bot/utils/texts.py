@@ -120,6 +120,13 @@ class Messages:
         "Выбери кнопку, которую нужно удалить."
     )
 
+    SUCCESS_REPLACE_TEXT_WITH_DOT = (
+        "✅ <b>Текста заменены на точку и пересланы в группу.</b>"
+    )
+
+    FAIL_REPLACE_TEXT_WITH_DOT = (
+        "⛔️ Произошла ошибка при замене текста на точку или пересылке в группу."
+    )
 
 class Buttons:
     CHOISE_PLACE_FOR_BUTTON = (

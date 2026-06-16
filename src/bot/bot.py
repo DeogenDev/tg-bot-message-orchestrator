@@ -23,6 +23,7 @@ class TelegramBot:
         self,
         token: str,
         allowed_users: list[int],
+        forward_group_id: int,
         channels_service: ChannelServiceBase,
         messages_service: MessagesServiceBase
     ) -> None:
@@ -32,6 +33,7 @@ class TelegramBot:
         )
         self.dp = Dispatcher()
         self.allowed_users = allowed_users
+        self.forward_group_id = forward_group_id
         self.channels_service = channels_service
         self.messages_service = messages_service
 
@@ -42,7 +44,8 @@ class TelegramBot:
             observer.middleware(
                 ContextMiddleware(
                     self.channels_service,
-                    self.messages_service
+                    self.messages_service,
+                    self.forward_group_id
                 )
             )
 
